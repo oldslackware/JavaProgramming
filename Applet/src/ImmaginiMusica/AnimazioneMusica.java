@@ -1,0 +1,138 @@
+/*
+ * AnimazioneMusica.java
+ *
+ * Created on 13 maggio 2007, 17.05
+ *
+ * To change this template, choose Tools | Template Manager
+ * and open the template in the editor.
+ */
+
+/*<html>
+  <head>
+    <title></title>
+  </head>
+  <body>
+      <applet code="ImmaginiMusica.class" width="997" height="766">
+          <param name="image0" value="0.gif">
+          <param name="image1" value="1.gif">
+          <param name="image2" value="2.gif">
+          <param name="image3" value="3.gif">
+          <param name="image4" value="4.gif">
+          <param name="image5" value="5.gif">
+          <param name="pausa" value="40000">
+	  [AudioPlayer applet]
+      </applet>
+  
+  </body>
+</html>*/
+
+//lanciare all'inizio appletviewer AnimazioneMusica.html'
+
+/**
+ *
+ * @author luciano
+ */
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.applet.AudioClip;
+public class AnimazioneMusica extends JApplet implements Runnable{
+    AudioClip musica;
+    Image[]immagini=new Image[6];
+    int numeroImmagini=0;
+    int corrente=0;
+    Thread runner;
+    int pausa=45000;
+    
+    public void init(){
+        musica=getAudioClip(getCodeBase(),"musica.au");
+        setLayout(new BorderLayout());
+        Panel buttons=new Panel();
+        Button playButton=new Button("Play");
+        Button stopButton=new Button("Stop");
+        playButton.addActionListener(new ButtonHandler());
+        stopButton.addActionListener(new ButtonHandler());
+        buttons.add(playButton);
+        buttons.add(stopButton);
+        add("South",buttons);
+        for(int i=0;i<6;i++){
+            String myImage=null;
+            myImage=getParameter("image"+i);
+            if(myImage!=null){
+                numeroImmagini++;
+                immagini[i]=getImage(getCodeBase(),myImage);
+            }else
+                break;
+        }
+        String pausaMyImage=null;
+        pausaMyImage=getParameter("pausa");
+        if(pausaMyImage!=null){
+            pausa=Integer.parseInt(pausaMyImage);
+        }
+    }
+
+    
+public void paint(Graphics screen){
+    Graphics2D screen2D=(Graphics2D)screen;
+    if(immagini[corrente]!=null){
+        screen2D.drawImage(immagini[corrente],0,0,this);
+    }
+}
+    
+    public void start(){
+        if(runner==null){
+            runner=new Thread(this);
+            runner.start();
+        }
+    }
+    
+    public void run(){
+        Thread questoThread=Thread.currentThread();
+        while(runner==questoThread){
+            repaint();
+            corrente++;
+            if(corrente>=numeroImmagini)
+                corrente=0;
+        try{
+            Thread.sleep(pausa);
+        }catch(InterruptedException e){}
+        
+        
+        }
+    
+    
+    
+    
+    
+    
+    
+}
+    public void stop(){
+        if(runner!=null){
+            runner=null;
+            musica.stop();
+        }
+        
+        
+        
+        
+    }
+
+
+
+class ButtonHandler implements ActionListener{
+    public void actionPerformed(ActionEvent e){
+       String s=e.getActionCommand();
+        if("Play".equals(s))musica.play();
+        else if("Stop".equals(s))musica.stop();
+    }
+}
+
+
+
+
+
+
+
+
+}
